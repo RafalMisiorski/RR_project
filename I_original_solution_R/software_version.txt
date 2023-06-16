@@ -1,0 +1,25 @@
+Info obtained using sessionInfo() function:
+
+R version: 4.2.1.
+
+version of libraries used in the analysis (other attached packages):
+- caret_6.0-93
+- lattice_0.20-45
+- ggplot2_3.4.0
+- dplyr_1.0.10
+- lubridate_1.8.0
+- psych_2.2.9
+- tensorflow_2.11.0
+- keras_2.11.1     
+- corrplot_0.92
+- MASS_7.3-57
+- quantmod_0.4.20
+- TTR_0.24.3
+- xts_0.12.2
+- zoo_1.8-11
+- car_3.1-1
+- carData_3.0-5
+- caTools_1.18.2
+- xgboost_1.6.0.1
+- neuralnet_1.44.2
+- readr_2.1.3

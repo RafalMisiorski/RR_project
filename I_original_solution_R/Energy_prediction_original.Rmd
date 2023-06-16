@@ -1,7 +1,7 @@
 ---
 title: "Energy prediction - original file to be translated"
 authors: "Rafal Misiorski, Michal Stryjek, Kamil Golis"
-date: "05 06 2023"
+date: "16 06 2023"
 output:
   html_document:
     df_print: paged
@@ -51,7 +51,7 @@ Sys.setenv(LANG = "en")
 
 First load the data
 ```{r message=FALSE, warning=FALSE}
-data <- read_csv("energydata_complete.csv")
+data <- read_csv("../data/energydata_complete.csv")
 ```
 
 Exploratory data analysis
