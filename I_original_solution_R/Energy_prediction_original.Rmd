@@ -1,0 +1,349 @@
+---
+title: "Energy prediction - original file to be translated"
+authors: "Rafal Misiorski, Michal Stryjek, Kamil Golis"
+date: "05 06 2023"
+output:
+  html_document:
+    df_print: paged
+---
+
+
+The environment and console is cleared to perform regression algorithms.
+```{r message=FALSE, warning=FALSE}
+gc()
+rm(list = ls())
+```
+The Energy dataset consists of energy use in Watt-hours in a house denoted every 10 minutes. The period of measurement lasted 4,5 months.
+
+The main attributes are:
+- The temperature in every room of a house
+- Humidity in every room of a house
+- Temperature outside
+- Humidity outside
+- Pressure
+- Wind speed
+- Visibility
+- 2 random variables
+- Time 
+
+
+For the regression problem two algorithms were used: XGBoost and Convolutional Neural Networks.
+
+The necessary libraries are loaded.
+```{r message=FALSE, warning=FALSE, include=FALSE}
+library(readr)
+library(neuralnet)
+library(xgboost)
+library(caTools)
+library(car)
+library(quantmod)
+library(MASS)
+library(corrplot)
+library(keras)
+library(tensorflow)
+library(psych)
+library(lubridate)
+library(dplyr)
+library(caret)
+
+Sys.setenv(LANG = "en")
+```
+
+First load the data
+```{r message=FALSE, warning=FALSE}
+data <- read_csv("energydata_complete.csv")
+```
+
+Exploratory data analysis
+I'm Checking whether any missing values are present in the dataset
+```{r}
+print(sum(is.na(data)))
+```
+As per printed code, there are no missing values.
+
+The dataset is summarized
+```{r}
+summary(data)
+```
+
+I am checking the data types of each column.
+```{r}
+sapply(data, class)
+```
+All variables except of the date are numeric. The only column which might be transformed is time as it might be broken down into diverse time intervals. Therefore, the year, month, day, hour, minute, and second variables are extracted.
+```{r}
+data$year <- year(data$date)
+data$month <- month(data$date)
+data$day <- day(data$date)
+data$hour <- hour(data$date)
+data$minute <- minute(data$date)
+data$second <- second(data$date)
+```
+
+The new variable is created indicating the day of the week, hour of the day and time of the day (morning,afternoon or evening).
+
+```{r}
+data$day_of_week <- wday(data$date, label = TRUE)
+data$hour_of_day <- hour(data$date)
+data$time_of_day <- ifelse(data$hour_of_day >= 6 & data$hour_of_day < 12, "morning",
+                           ifelse(data$hour_of_day >= 12 & data$hour_of_day < 18, "afternoon", "evening"))
+```
+
+All variables are converted to numeric data type.
+
+```{r}
+numeric_columns <- which(sapply(data, is.numeric))
+data_numeric <- data[, numeric_columns]
+```
+
+The date variable is removed from the dataset as other time related variables were added recently. The Random Variable 1 and 2 are removed as the author of the dataset added it on purpose to make additional noise of data. 
+
+```{r}
+data_numeric <- dplyr::select(data_numeric, -second, -year, -hour_of_day, -rv1, -rv2)
+```
+
+The regression model was created with all variables to check if the multicollinearity is present.
+
+```{r}
+model_all <- lm(Appliances ~ ., data=data_numeric) 
+summary(model_all)
+vif(model_all)
+```
+
+As per shown Variance Inflated factor, there are a lot of variables which are correlated to each other (the VIF exceeds 4 treshold). Therefore I remove iteratively variables with high VIF and check again if the model consists highly correlated variables.
+
+```{r message=TRUE, warning=TRUE, include=FALSE}
+#I will remove TDewpoint,
+data_numeric <- dplyr::select(data_numeric, -Tdewpoint)
+model_all <- lm(Appliances ~ ., data=data_numeric)
+vif(model_all)
+
+#T9 removed
+data_numeric <- dplyr::select(data_numeric, -T9)
+model_all <- lm(Appliances ~ ., data=data_numeric)
+vif(model_all)
+
+#Month removed
+data_numeric <- dplyr::select(data_numeric, -month)
+model_all <- lm(Appliances ~ ., data=data_numeric)
+vif(model_all)
+
+#T6 removed
+data_numeric <- dplyr::select(data_numeric, -T6)
+model_all <- lm(Appliances ~ ., data=data_numeric)
+vif(model_all)
+
+#T2 removed
+data_numeric <- dplyr::select(data_numeric, -T2)
+model_all <- lm(Appliances ~ ., data=data_numeric)
+vif(model_all)
+
+#T7 removed
+data_numeric <- dplyr::select(data_numeric, -T7)
+model_all <- lm(Appliances ~ ., data=data_numeric)
+vif(model_all)
+
+#RH_4 removed
+data_numeric <- dplyr::select(data_numeric, -RH_4)
+model_all <- lm(Appliances ~ ., data=data_numeric)
+vif(model_all)
+
+# #RH_1 removed
+data_numeric <- dplyr::select(data_numeric, -RH_1)
+model_all <- lm(Appliances ~ ., data=data_numeric)
+vif(model_all)
+
+# T1 removed
+data_numeric <- dplyr::select(data_numeric, -T1)
+model_all <- lm(Appliances ~ ., data=data_numeric)
+vif(model_all)
+
+# RH_7 removed
+data_numeric <- dplyr::select(data_numeric, -RH_7)
+model_all <- lm(Appliances ~ ., data=data_numeric)
+vif(model_all)
+
+
+# RH_3 removed
+data_numeric <- dplyr::select(data_numeric, -RH_3)
+model_all <- lm(Appliances ~ ., data=data_numeric)
+vif(model_all)
+
+# RH_8 removed
+data_numeric <- dplyr::select(data_numeric, -RH_8)
+model_all <- lm(Appliances ~ ., data=data_numeric)
+vif(model_all)
+
+# T5 removed
+data_numeric <- dplyr::select(data_numeric, -T5)
+model_all <- lm(Appliances ~ ., data=data_numeric)
+vif(model_all)
+
+# RH_6 removed
+data_numeric <- dplyr::select(data_numeric, -RH_6)
+model_all <- lm(Appliances ~ ., data=data_numeric)
+vif(model_all)
+
+# T3 removed
+data_numeric <- dplyr::select(data_numeric, -T3)
+model_all <- lm(Appliances ~ ., data=data_numeric)
+vif(model_all)
+
+# RH_2 removed
+data_numeric <- dplyr::select(data_numeric, -RH_2)
+model_all <- lm(Appliances ~ ., data=data_numeric)
+vif(model_all)
+```
+
+The minute variable is almost uncorrelated with other variables, hence the it will be removed from the dataset as well.
+
+```{r include=FALSE}
+# minute removed
+data_numeric <- dplyr::select(data_numeric, -minute)
+model_all <- lm(Appliances ~ ., data=data_numeric)
+vif(model_all)
+```
+
+```{r echo=TRUE}
+# T4 removed
+data_numeric <- dplyr::select(data_numeric, -T4)
+model_all <- lm(Appliances ~ ., data=data_numeric)
+vif(model_all)
+```
+
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+corPlot(data_numeric, cex = 0.5, margin = c(4,4,4,4))
+```
+The above plot shows that the variables are correlated to the moderate level at most.
+
+It turns out that there is no need to keep date, day of week and time of day variables.
+```{r}
+data <- dplyr::select(data, -date)
+data <- dplyr::select(data, -day_of_week)
+data <- dplyr::select(data, -time_of_day)
+
+# Create a vector of predictors
+predictors <- names(data_numeric)
+predictors <- predictors[predictors != "Appliances"]
+```
+
+The independent variables are standardized to avoid biased results of predictions.
+
+```{r}
+# Subset the data to include only the predictors
+subset_data <- data_numeric[, predictors]
+
+# Standardize the predictors
+subset_data <- scale(subset_data)
+
+# Re-combine the standardized predictors with the "Appliances" variable
+data_numeric[, predictors] <- subset_data
+```
+
+The dataset is divided into training and test set with ratio 80/20.
+```{r}
+set.seed(123)
+data <- data_numeric
+# split the data into training and testing data
+train_indices <- sample(1:nrow(data), 0.8*nrow(data))
+train_data <- data[train_indices, ]
+test_data <- data[-train_indices, ]
+# Define the predictor variables
+predictors <- names(data)[-c(1,2)]
+response <- "Appliances"
+```
+
+Both sets are converted into DMatrix
+```{r}
+dtrain <- xgb.DMatrix(data = as.matrix(train_data[predictors]), label = unlist(train_data[response]))
+dtest <- xgb.DMatrix(data = as.matrix(test_data[predictors]))
+```
+
+The XGBoost model is trained. After many trials with hyperparameter tuning, the following parameters were chosen:
+lambda = 0.8
+alpha =0.9 
+nrounds = 100
+colsample_bytree = 0.6 
+gamma=0.85 
+eta = 0.036 
+max_depth = 25, 
+min_child_weight = 1, 
+subsample=0.8, 
+num_parallel_tree = 4 
+early_stopping_rounds = 50
+
+The most significant hyperparameters was eta and number of parallel trees.
+
+```{r include=FALSE}
+# Train the XGBoost model on the training data
+xgb_model <- xgboost(data = dtrain,objective = "reg:squarederror",lambda = 0.8,alpha =0.9, nrounds = 100,colsample_bytree = 0.6, gamma=0.85 , eta = 0.036, max_depth = 25, min_child_weight = 1, subsample=0.8, num_parallel_tree = 4, early_stopping_rounds = 50)
+```
+
+The predictions on test data and MAPE are generated.
+```{r}
+
+# Make predictions on the test data
+predictions <- predict(xgb_model, newdata = dtest)
+
+# Extract the response variable from the test data as a vector
+test_response <- unlist(test_data[response])
+
+# Calculate the absolute percentage error
+ape <- abs((test_response - predictions) / test_response)
+
+# Calculate the mean absolute percentage error
+MAPE <- mean(ape) * 100
+
+# Print the result
+print(MAPE)
+```
+
+The Result is MAPE: 24 percent.
+
+The next used algorithm is Convolutional Neural Network trained in Keras library. The used division of training and test set is 70/30. The model has 3 hidden layers with 16, 4 and 2 units. Such setup allows to results with closed MAPE on training and validation set.  The loss function is mean squared error with Rectified linear unit activation function with 100 epochs. To compare results with the XGBoost algorithm, the mean absolut percentage error is also used as an evalutional metric. Due to the fact that the validation MAPE was lower than MAPE from the training set, I used L2 Regularization to reduce overfitting effect. 
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# Preprocess the data
+data_train <- data[1:round(0.7*nrow(data)),]
+data_test <- data[(round(0.7*nrow(data))+1):nrow(data),]
+x_train <- as.matrix(data_train[,-c(1,2)])
+y_train <- as.matrix(data_train[,2])
+x_test <- as.matrix(data_test[,-c(1,2)])
+y_test <- as.matrix(data_test[,2])
+
+# Build the model with L2 regularization
+model <- keras_model_sequential() %>%
+  layer_dense(units = 16, activation = "relu", input_shape = ncol(x_train),
+              kernel_regularizer = regularizer_l2(0.01)) %>%
+  layer_dense(units = 4, activation = "relu", kernel_regularizer = regularizer_l2(0.01)) %>%
+  layer_dense(units = 2, activation = "relu", kernel_regularizer = regularizer_l2(0.01)) %>%
+  layer_dense(units = 1, activation = "relu", kernel_regularizer = regularizer_l2(0.01)) 
+
+# Define a function to calculate MAPE
+mape <- function(y_true, y_pred) {
+  return(mean(abs((y_true - y_pred) / y_true)) * 100)
+}
+
+# Compile the model with MAPE as a metric
+model %>% compile(loss = "mean_squared_error", optimizer = "adam", 
+                  metrics = c("mean_absolute_percentage_error", mape))
+
+# Fit the model and evaluate its performance
+history <- model %>% fit(x_train, y_train, epochs = 100, batch_size = 32, 
+                         validation_data = list(x_test, y_test))
+
+```
+
+```{r echo=FALSE}
+# Plot the MAPE values during training
+plot(history)
+```
+The above plot presents that the MAPE on the training set is equal to 5.4 percent after 100 epochs. On the validation set the MAPE is equal to 4.74 percent. Due to the fact that the MAPE on the validation set is slightly lower than MAPE from the training set, the overfitting effect might be still present. The results are consistent for training set all epochs. The points validation restate a line which is almost parallel to the training one. 
+
+The CNN outperformed the XGBoost algorithm (4.74 percent vs 25 percent). Unfortunately the result might be biased. The complexity of the CNN model might was reduced as possible, therefore more training data could improved the results.
+
+Sources:
+Appliances energy prediction Data Set:
+https://archive.ics.uci.edu/ml/datasets/Appliances+energy+prediction
+
