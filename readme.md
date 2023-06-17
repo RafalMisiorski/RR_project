@@ -6,7 +6,7 @@
 
 ### Introduction
 
-The aim of our project is to reproduce the project originally written in R language (in a form of Rmd file - ``) in Python (using Jupyter notebooks) and then extend the original analysis. 
+The aim of our project is to reproduce the project originally written in R language (in a form of Rmd file - `Energy_prediction_original.Rmd`) in Python (using Jupyter notebooks) and then extend the original analysis. 
 
 The original project was created as an ad-hoc analysis for the sake of other course at University of Warsaw and we found much space to employ and implement reproducible research prinnciples here.
 
