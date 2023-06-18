@@ -19,19 +19,25 @@ We divided our reproduction process into two parts:
 
 The original R solution is not fully reproducible. In order to catch one version of reality to be then compared with reproduced Python results, we rendered the Rmd script to html format and listed versions of R and libraries used in the analysis (in the file `software_version.txt`).
 
-The whole Python solution (parts II and III) is fully reproducible. In order to achieve the same results, one should install python environment with packages (in appropriate version) used through the analysis according to file `requirements.txt` (present in the main folder of the repository). We used the Windows 10 operating system and python in version 3.8. In order to create the environment, simply type in the following command:
+The whole Python solution (parts II and III) is fully reproducible. In order to achieve the same results, one should install python environment with packages (in appropriate version) used through the analysis according to file `requirements.txt` (present in the main folder of the repository). We used the Windows 10 operating system, Python in version 3.8 and Anaconda platform. 
 
-conda create -n <env_name> python=3.8 --file <path_to_requirements>\requirements.txt
+REPRODUCTION STEPS:
 
-Then activate the environment:
-
-conda activate <env_name>
+1. Install required software (Windows 10, python 3.8, Anaconda)
+2. From Windows run Anaconda Prompt
+3. run command: conda create -n <env_name> python=3.8 --file <path_to_requirements>\requirements.txt
+    <env_name> can be selected freely and refers to the environment name of the new virtual environment
+    <path_to_requirements> is the path to the project folder in the system. It can be skipped if the Anaconda Prompt is run from the project directory
 
 In the case or problem while collecting the required libraries (we came across such a problem), before the environment creation, use the following command:
 
 conda config --add channels conda-forge
 
-Once the environment is ready and set up - one can reproduce our analysis.
+4. Activate the environment. Run command: conda activate <env_name>
+5. Move to III_best_practices_Python (command: dir <path_to_project>/III_best_practices_Python)
+6. Run Jupyter Notebook from this folder (command: jupyter notebook)
+7. From within the jupyter notebook UI open the Energy_prediction_best_practices_extended_Python.ipynb
+8. Run the code
 
 
 ### Sources Declaration
@@ -143,7 +149,11 @@ In the file Energy_prediction_best_practices_extended_Python.ipynb we firstly go
 
 ## 5. SUMMARY
 
-TBA
+The reproduction process was challenging, yet we managed to reproduce the results from original R solution to Python and then simplified and extended the analysis by assuming good practices learned through the course. The external functions defined in part III could be successfully used in further analysis or for the sake of analysis for other time-series data.  
+
+Our work is fully reproducible, what we appreciated as a result of the code translation. The source solution lacked the full reproducibility (XGBoost results reproducible, but CNN not), the clarity and consistency in terms of the data operations made to produce the models. Moreover, the original solution used a feature selection mechanism, which was iterated manytimes manually, which favours making mistakes in terms of rxcluding inappropriate variable. Finally, the inconsistencies in the code led to assuming wrong target variable for the CNN model training.
+
+We managed to recreate the whole process in Python, and then we corrected these mistakes in part III - we refer to it as the dream original version of the analysis.
 
 
 ## 6. FILES STRUCTURE
