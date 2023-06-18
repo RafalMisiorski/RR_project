@@ -119,7 +119,26 @@ We spotted the mistakes and inconsistencies in the original work, which were als
 
 ## 4. EXTENDED ANALYSIS IN PYTHON - IMPLEMENTING GOOD CODING/REPRODUCING PRACTICES (III_best_practices_Python)
 
-TBA
+All of the information in this section pertains to files in the directory III_best_practices_Python.
+
+In this section we built several external functions and used them to prepare the analysis in proper way. The results obtained in this version are:
+
+* simplified - we used external functions to minimise the code present in the main jupyter notebook and to provide a clear process to the analysis (prepare the data once).
+* extended - the prepared functions enable the user to built various models and assume various evaluation metrics for the sake of analysis - everything available by calling one function.
+
+What is important - the results for this part are fully reproducible, but they do not reproduce the original findings - in this part we correct the mistakes spotted in the original version, which affects the results.
+
+This part consists of two main parts:
+
+* external functions, which are the building blocks (present in the subdirectory src). They are covered in four Jupyter Notebooks, which are then loaded in the main one (we used jupyter notebooks instead of python scripts in order to simplify the dependencies of the external functions on other libraries). They are named in a way to reflect the structure of the analysis (note - there is no rr_II file, as the EDA consisted of a set of easy to use functions - we still do it manually):
+    * rr_I_load_packages.ipynb - refers to the part I - Import libraries - here we simply import required libraries.
+    * rr_III_prepare_data.ipynb - refers to the part III - Feature Engineering - here we define two functions: one for reading the csv file to pandas DataFrame, and the second one for feature engineering (exact functions description available inside the file).
+    * rr_IV_select_features.ipynb - refers to the part IV - Feature Selection. We define it here a function to select features according to VIF values automatically (exact function description available inside the file).
+    * rr_V_prepare_evaluate_model.ipynb - refers to the part 5 - Modelling - we define here two functions. The first one prepares the objects ready to create model (standard X/y train/test, assuming a defined train/test split). The second one fits a chosen model with defined hyperparameters and evaluates the predictions on train and test data using a chosen evaluation metric. Exact functions description available inside the file
+* The main jupyter file, where we apply the external functions (Energy_prediction_best_practices_extended_Python.ipynb - we also rendered it as html file - Energy_prediction_best_practices_extended_Python.html)
+
+In the file Energy_prediction_best_practices_extended_Python.ipynb we firstly go through the analysis in the order outlined earlier (through points 1-5, libraries imports, EDA, feature engineering and selection and modelling). The process is straightforward and far less code-consuming, as we use our external functions. Then, as a bonus, we provide an additional analysis. We build a set of various models built by calling one function (we prepared XGBoost, Linear Regression, Light GBM and Random Forest models, but sky is the limit - the function is very universal). We also applied various evaluation metrics (MAPE/MAE/R^2/MSE). Finally, we built different models using the same evaluation metric to make them comparable (in comparison with the models created in original work). 
+
 
 
 ## 5. SUMMARY
