@@ -26,6 +26,7 @@ REPRODUCTION STEPS:
 1. Install required software (Windows 10, python 3.8, Anaconda)
 2. From Windows run Anaconda Prompt
 3. run command: conda create -n <env_name> python=3.8 --file <path_to_requirements>\requirements.txt
+   
     <env_name> can be selected freely and refers to the environment name of the new virtual environment
     <path_to_requirements> is the path to the project folder in the system. It can be skipped if the Anaconda Prompt is run from the project directory
 
