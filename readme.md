@@ -2,6 +2,8 @@
 
 ### AUTHORS: RAFAŁ MISIÓRSKI, MICHAŁ STRYJEK, KAMIL GOLIS
 
+<br>
+
 ## 1. PROJECT OVERVIEW
 
 ### Introduction
@@ -36,9 +38,9 @@ REPRODUCTION STEPS:
    conda config --add channels conda-forge
 
 4. Activate the environment. Run command: conda activate <env_name>
-5. Move to III_best_practices_Python (command: dir <path_to_project>/III_best_practices_Python)
+5. Move to `II_reproduced_original_Python` or `III_best_practices_Python` (command: dir <path_to_project>/II_reproduced_original_Python or dir <path_to_project>/III_best_practices_Python)
 6. Run Jupyter Notebook from this folder (command: jupyter notebook)
-7. From within the jupyter notebook UI open the Energy_prediction_best_practices_extended_Python.ipynb
+7. From within the jupyter notebook UI open the `Energy_prediction_reproduced_in_Python.ipynb` or `Energy_prediction_best_practices_extended_Python.ipynb`
 8. Run the code
 
 
@@ -62,21 +64,17 @@ This repository and the documentation is divided into three major parts reflecti
 
 We are going to describe each part of the analysis and reproduction process and then summarise the whole reproduction process.
 
-
+<br>
 
 ## 2. ORIGINAL SOLUTION (I_original_solution_R)
 
 All of the information in this section pertains to files in the directory `I_original_solution_R`.
 
-
 The original solution is the Rmd file contatining the analysis for regression problem. At the start, there were a few files with the (The whole project (regression+classification) `Machine_Learning_2_Project_RM.Rmd`, regression problem solution using XGBoost `XG_Boost_approach_3_w_standardization.R` and regression problem solution using CNN `CNN_approach.R`). Since our aim is to reproduce the regression problem, and due to fact that the separate analyses for XGBoost and CNN are also included in the main Rmd file, we decided to modify the `Machine_Learning_2_Project_RM.Rmd` in a way to include only the regression problem, and we moved the rest of the files to directory `original_files_irrelevant`. The final file with original solution is named as `Energy_prediction_original.Rmd`.
-
 
 In the original Rmd file, the task is to predict the appliancies energy use in low-energy building in 10-minute intervals. The autor used variance inflation factor analysis in order to select features used in the modelling process (in a way to avoid multicollinearity). The author trained XGBoost and Convolutional Neural Network models and applied them for predictions. The evaluation metric for the results was mean absolute percentage error.
 
-
 Throughout the translation to Python and reproduction process, we found many inconsistencies and challenges, that we have to tackle. These challenges were:
-
 
 * The R solution was not fully reproducible. As stated earlier, in order to provide the reproducibility at least to some degree, we rendered the Rmd script to html format and listed versions of R and libraries used in the analysis.
 * There was no clear structure stated in the original file. Based on the content of the Rmd file, we outlined the five major parts of the analysis: 1. Import libraries used in the analysis, 2. Exploratory Data Analysis, 3. Feature Engineering, 4. Feature Selection and  5. Modelling.
@@ -85,15 +83,13 @@ Throughout the translation to Python and reproduction process, we found many inc
 * The dataset was divided into train/test in different ways for XGBoost and CNN, and thus the results obtained for these models are not comparable. In part II we reproduce this approach, but in part III we employ a consistent method to assign the observations to train and test datasets (we do it once through the analysis).
 * The results obtained for CNN in original work were different from the ones declared by author in the Rmd file. He mistook the values obtained for the CNN training and prediction. We re-ran and rendered the original Rmd file to provide a basis for comparison with solution reproduced in Python.
 
-
+<br>
 
 ## 3. R-TO-PYTHON TRANSLATION AND REPRODUCTION (II_reproduced_original_Python)
 
 All of the information in this section pertains to files in the directory `II_reproduced_original_Python`.
 
-
 The aim of this part was to translate from R to Python the original solution, and reproduce the results **as closely as possible**. The analysis is fully reproducible thanks to declaring the software version and setting several seeds. We adopted the approach outlined in the original solution, including the inconsistencies present in the original solution. The analysis consists of five parts, as stated earlier (according to the content of original file):
-
 
 1. Import libraries used in the analysis
 2. Exploratory Data Analysis
@@ -101,33 +97,26 @@ The aim of this part was to translate from R to Python the original solution, an
 4. Feature Selection
 5. Modelling
 
-
 In part 1 we import the libraries needed for the analysis. We expected, that the reproduced solution should be quite similar to the original one, as in original R solution author used  `keras` and `tensorflow` (installed through `reticulate`), and the `XGBoost` library is available both in Python and R - we could use the same architecture/hyperparameters, which increased our chance to succeed.
-
 
 In part 2 we conducted an EDA. All of the functions used in R solution had their close reference in Python (e.g. R `summary` vs. Python `describe`). It was pretty simple to reproduce the results here.
 
-
 In part 3 we created additional features which are used later in the analysis. The feature engineering pertains to the `date` column (in fact this variable contained information about date and time of the observations made). In Python solution we used for this task `datetime` library and the results are exactly the same as in the case of original Rmd file. We noticed, that some of the created features are then excluded (since they were created as character, not numeric) - here we recreate it, but in part III we use an external function for the feature engineering and we recode all features as numeric type.
-
 
 In part 4 we recreated the feature selection mechanism present in the original file - by calculating variance inflation factor values for the regressors. This part was a bit challenging, as there was no straightforward way to calculate VIF in Python to obtain results similar to those obtained in R (using the `car` library). To overcome this challenge, we used and modified slightly the function from StackOverflow thread (exact source avaialble in the `Sources Declaration` section). Thanks to the function, we obtained almost the same results as in the R original solution. We followed the method proposed in original solution and calculated and excluded the variables manually - we automate the feature selection process in part III, where we introduce an external function to do it.
 
-
 In part 5 we prepared the models - XGBoost and CNN. We expected that the results should be similar, yet there were two problems: a minor one and a major one. The minor one was the fact, that the original Rmd solution was not fully reproducible (The results of CNN were difefrent each time we run the code). The second one was bigger, as the author mistook the MAPE values and stated that MAPE for training set was 5.4%, while for the test set 4.74%. We made multiple re-runs of the file and rendered it - the resulting MAPE values were set around 110-115%. We prepared the Python version of the XGBoost and CNN models and the results were very similar:
-
 
 * XGBoost - test data MAPE: R - 24.4%, Python - 23.8% - success!
 * CNN - train/test datea MAPE: R - ~110%/~115%, Python - 112.3%/110.1% - there are some differences, but we perceive the results reproduction as successful!
 
-
 We spotted the mistakes and inconsistencies in the original work, which were also present in the reproduced version translated to Python. However, it is not the end of our analysis. We create both simplified and extended analysis assuming good coding practices in the next part.
 
-
+<br>
 
 ## 4. EXTENDED ANALYSIS IN PYTHON - IMPLEMENTING GOOD CODING/REPRODUCING PRACTICES (III_best_practices_Python)
 
-All of the information in this section pertains to files in the directory III_best_practices_Python.
+All of the information in this section pertains to files in the directory `III_best_practices_Python`.
 
 In this section we built several external functions and used them to prepare the analysis in proper way. The results obtained in this version are:
 
@@ -139,15 +128,15 @@ What is important - the results for this part are fully reproducible, but they d
 This part consists of two main parts:
 
 * external functions, which are the building blocks (present in the subdirectory src). They are covered in four Jupyter Notebooks, which are then loaded in the main one (we used jupyter notebooks instead of python scripts in order to simplify the dependencies of the external functions on other libraries). They are named in a way to reflect the structure of the analysis (note - there is no rr_II file, as the EDA consisted of a set of easy to use functions - we still do it manually):
-    * rr_I_load_packages.ipynb - refers to the part I - Import libraries - here we simply import required libraries.
-    * rr_III_prepare_data.ipynb - refers to the part III - Feature Engineering - here we define two functions: one for reading the csv file to pandas DataFrame, and the second one for feature engineering (exact functions description available inside the file).
-    * rr_IV_select_features.ipynb - refers to the part IV - Feature Selection. We define it here a function to select features according to VIF values automatically (exact function description available inside the file).
-    * rr_V_prepare_evaluate_model.ipynb - refers to the part 5 - Modelling - we define here two functions. The first one prepares the objects ready to create model (standard X/y train/test, assuming a defined train/test split). The second one fits a chosen model with defined hyperparameters and evaluates the predictions on train and test data using a chosen evaluation metric. Exact functions description available inside the file
-* The main jupyter file, where we apply the external functions (Energy_prediction_best_practices_extended_Python.ipynb - we also rendered it as html file - Energy_prediction_best_practices_extended_Python.html)
+    * `rr_I_load_packages.ipynb` - refers to the part I - Import libraries - here we simply import required libraries.
+    * `rr_III_prepare_data.ipynb` - refers to the part III - Feature Engineering - here we define two functions: one for reading the csv file to pandas DataFrame, and the second one for feature engineering (exact functions description available inside the file).
+    * `rr_IV_select_features.ipynb` - refers to the part IV - Feature Selection. We define it here a function to select features according to VIF values automatically (exact function description available inside the file).
+    * `rr_V_prepare_evaluate_model.ipynb` - refers to the part 5 - Modelling - we define here two functions. The first one prepares the objects ready to create model (standard X/y train/test, assuming a defined train/test split). The second one fits a chosen model with defined hyperparameters and evaluates the predictions on train and test data using a chosen evaluation metric. Exact functions description available inside the file
+* The main jupyter file, where we apply the external functions (`Energy_prediction_best_practices_extended_Python.ipynb` - we also rendered it as html file - `Energy_prediction_best_practices_extended_Python.html`)
 
-In the file Energy_prediction_best_practices_extended_Python.ipynb we firstly go through the analysis in the order outlined earlier (through points 1-5, libraries imports, EDA, feature engineering and selection and modelling). The process is straightforward and far less code-consuming, as we use our external functions. Then, as a bonus, we provide an additional analysis. We build a set of various models built by calling one function (we prepared XGBoost, Linear Regression, Light GBM and Random Forest models, but sky is the limit - the function is very universal). We also applied various evaluation metrics (MAPE/MAE/R^2/MSE). Finally, we built different models using the same evaluation metric to make them comparable (in comparison with the models created in original work). 
+In the file `Energy_prediction_best_practices_extended_Python.ipynb` we firstly go through the analysis in the order outlined earlier (through points 1-5, libraries imports, EDA, feature engineering and selection and modelling). The process is straightforward and far less code-consuming, as we use our external functions. Then, as a bonus, we provide an additional analysis. We build a set of various models built by calling one function (we prepared XGBoost, Linear Regression, Light GBM and Random Forest models, but sky is the limit - the function is very universal). We also applied various evaluation metrics (MAPE/MAE/R^2/MSE). Finally, we built different models using the same evaluation metric to make them comparable (in comparison with the models created in original work). 
 
-
+<br>
 
 ## 5. SUMMARY
 
@@ -157,7 +146,32 @@ Our work is fully reproducible, what we appreciated as a result of the code tran
 
 We managed to recreate the whole process in Python, and then we corrected these mistakes in part III - we refer to it as the dream original version of the analysis.
 
+<br>
 
 ## 6. FILES STRUCTURE
 
-TBA
+Below find the description of the structure of our project with a brief description of each catalogue and file:
+
+* data - directory with the original dataset.
+    * energydata_complete.csv - csv file with the data.
+* I_original_solution_R - directory with files concerning the original R solution.
+    * original_files_irrelevant - directory with files concerning the original solution - not needed for the analysis, yet we keep them to be transparent
+        * `CNN_approach.R` - the R script with CNN model for regression problem.
+        * `Machine_Learning_2_Project_RM.Rmd` - the Rmd file with solution to a regression and classification problem (we wanted to translate exclusively the regression task).
+        * `XG_Boost_approach_3_w_standarization.R` - the R script with XGBoost model for regression problem.
+    * Energy_prediction_original.html - the output of the original solution - rendered to catch a possible reality provided in the original analysis.
+    * Energy_prediction_original.Rmd - the file with original solution, which we strived to reproduce and translate to Python.
+    * software_version.txt - a file with information on R and external packages version used in the original analysis.
+* II_reproduced_original_Python - directory with files concerning the translation of original R solution to Python.
+    * `Energy_prediction_reproduced_in_Python.html` - html output of the jupyter notebook with the translation from R to Python of the original solution.
+    * `Energy_prediction_reproduced_in_Python.ipynb` - jupyter notebook with the R-to-Python translation and reproduction of results
+* III_best_practices_Python - directory with files concerning the simplified and extended analysis in Python.
+    * src - directory with external functions used in the analysis.
+        * `rr_I_load_packages.ipynb` - notebook used to import libraries.
+        * `rr_III_prepare_data.ipynb` - notebook with functions for data loading and feature engineering.
+        * `rr_IV_select_features.ipynb` - notebook with function for feature selection.
+        * `rr_V_prepare_evaluate_model.ipynb` - notebook with functions to prepare data for modelling and train and evaluate models.
+    * `Energy_prediction_best_practices_extended_Python.html` - output of the main jupyter notebook for this part
+    * `Energy_prediction_best_practices_extended_Python.ipynb` - the main jupyter notebook for this part, where we apply the external functions
+* `readme.md` - documentation of the project, the file u are currently reading. 
+* `requirements.txt` - the document with libraries version used for the Python analysis. Could be used to reproduce the results by creating and setting up an appropriate environment. 
