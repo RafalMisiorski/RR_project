@@ -31,9 +31,9 @@ REPRODUCTION STEPS:
    
     <path_to_requirements> is the path to the project folder in the system. It can be skipped if the Anaconda Prompt is run from the project directory
 
-In the case or problem while collecting the required libraries (we came across such a problem), before the environment creation, use the following command:
+   In the case or problem while collecting the required libraries (we came across such a problem), before the environment creation, use the following      command:
 
-conda config --add channels conda-forge
+   conda config --add channels conda-forge
 
 4. Activate the environment. Run command: conda activate <env_name>
 5. Move to III_best_practices_Python (command: dir <path_to_project>/III_best_practices_Python)
