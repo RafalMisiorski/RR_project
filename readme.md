@@ -28,6 +28,7 @@ REPRODUCTION STEPS:
 3. run command: conda create -n <env_name> python=3.8 --file <path_to_requirements>\requirements.txt
    
     <env_name> can be selected freely and refers to the environment name of the new virtual environment
+   
     <path_to_requirements> is the path to the project folder in the system. It can be skipped if the Anaconda Prompt is run from the project directory
 
 In the case or problem while collecting the required libraries (we came across such a problem), before the environment creation, use the following command:
